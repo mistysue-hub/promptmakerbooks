@@ -1,0 +1,954 @@
+<title>Read, Play, Debate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --bg: #F4F7F3;
+    --surface: #FFFFFF;
+    --ink: #16302A;
+    --ink-2: #3D524C;
+    --muted: #62756F;
+    --line: #D6DFD9;
+    --accent: #1B6870;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E2EFEC;
+    --hl: #F6DB55;
+    --hl-soft: rgba(246, 219, 85, 0.6);
+    --hl-ink: #2B2406;
+    --code: #EBF0EC;
+    --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0F1715;
+      --surface: #16211E;
+      --ink: #E3ECE8;
+      --ink-2: #B7C6C0;
+      --muted: #8EA19A;
+      --line: #293733;
+      --accent: #6BC0C6;
+      --accent-ink: #0C1614;
+      --accent-soft: #1A3032;
+      --hl: #E6C84A;
+      --hl-soft: rgba(230, 200, 74, 0.3);
+      --hl-ink: #221C03;
+      --code: #1D2A27;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0F1715;
+    --surface: #16211E;
+    --ink: #E3ECE8;
+    --ink-2: #B7C6C0;
+    --muted: #8EA19A;
+    --line: #293733;
+    --accent: #6BC0C6;
+    --accent-ink: #0C1614;
+    --accent-soft: #1A3032;
+    --hl: #E6C84A;
+    --hl-soft: rgba(230, 200, 74, 0.3);
+    --hl-ink: #221C03;
+    --code: #1D2A27;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  .mark {
+    background: linear-gradient(to bottom, transparent 56%, var(--hl-soft) 56%, var(--hl-soft) 94%, transparent 94%);
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    padding: 0 0.08em;
+  }
+
+  /* Header */
+  .top { padding-block: 56px 36px; }
+  h1 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(42px, 8.5vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    margin: 0 0 20px;
+  }
+  .lead { font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 58ch; margin: 0 0 14px; }
+  .short { max-width: 62ch; margin: 0 0 28px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toc a {
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+  .toc a:hover { border-color: var(--ink); }
+
+  /* Sections */
+  section { padding-block: 56px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+  h2 {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(29px, 4.6vw, 40px);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 0 0 12px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 21px;
+    line-height: 1.25;
+    margin: 40px 0 12px;
+    text-wrap: balance;
+  }
+  .sec-lead { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 0 0 30px; }
+  p { margin: 0 0 12px; }
+  .prose { max-width: 66ch; }
+  ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+  .label {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Six inputs */
+  .inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 30px 36px; }
+  .input { border-top: 3px solid var(--ink); padding-top: 14px; }
+  .input h3 { margin: 0 0 6px; font-size: 20px; }
+  .input p { margin: 0; color: var(--ink-2); font-size: 16px; }
+
+  /* Beats */
+  .beats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .beat { padding: 18px 18px 20px; border-left: 1px solid var(--line); }
+  .beat:first-child { border-left: 0; }
+  .beat-name { font-family: var(--display); font-weight: 800; font-size: 24px; line-height: 1.1; margin: 0 0 4px; }
+  .beat .label { display: block; margin-bottom: 10px; }
+  .beat p { font-size: 15.5px; color: var(--ink-2); margin: 0; }
+  .note { font-size: 14.5px; color: var(--muted); margin-top: 12px; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 15.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  th { font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 700; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td strong { font-family: var(--display); font-weight: 600; font-size: 16.5px; }
+  .code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--code);
+    padding: 2px 7px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .soft { color: var(--ink-2); }
+
+  .aside {
+    background: var(--accent-soft);
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin-top: 24px;
+    max-width: 72ch;
+  }
+  .aside p:last-child { margin-bottom: 0; }
+
+  .rule {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(23px, 3.4vw, 31px);
+    line-height: 1.25;
+    max-width: 32ch;
+    margin: 6px 0 16px;
+    text-wrap: balance;
+  }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px 22px; margin-top: 26px; }
+  .panel h3 { margin-top: 0; }
+
+  /* Debate */
+  .tests { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px 32px; }
+  .test { border-top: 3px solid var(--ink); padding-top: 12px; }
+  .test h4 { font-family: var(--display); font-weight: 600; font-size: 19px; margin: 0 0 4px; }
+  .test p { margin: 0; color: var(--ink-2); font-size: 16px; }
+  .rewrites { display: grid; gap: 10px; margin-top: 22px; max-width: 72ch; }
+  .rewrite { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font-size: 16.5px; }
+  .rewrite .from { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .rewrite .arrow { color: var(--muted); }
+  .rewrite .to { font-weight: 700; }
+
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 0; display: grid; gap: 16px; max-width: 72ch; }
+  ol.steps > li { counter-increment: step; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 14px; align-items: start; }
+  ol.steps > li::before {
+    content: counter(step);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    display: grid; place-items: center;
+    font-family: var(--display); font-weight: 800; font-size: 15px;
+    line-height: 1;
+  }
+  ol.steps p { margin: 0; }
+  .gate {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: var(--hl);
+    color: var(--hl-ink);
+  }
+
+  .rubric { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; max-width: 760px; }
+  .rubric div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .rubric b { display: block; font-family: var(--display); font-weight: 600; font-size: 17px; }
+  .rubric span { font-size: 14.5px; color: var(--ink-2); }
+
+  /* Widgets */
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px 40px; }
+  .split h3 { margin-top: 0; }
+  .lenses { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .lens { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px 18px; }
+  .lens .label { display: block; margin-bottom: 8px; }
+  .lens p { margin: 0; font-size: 16.5px; }
+
+  /* Builder */
+  .builder { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 32px; align-items: start; }
+  .example-tag {
+    display: inline-block;
+    font-size: 13px; font-weight: 700;
+    padding: 3px 11px;
+    border-radius: 999px;
+    background: var(--hl);
+    color: var(--hl-ink);
+    margin-bottom: 16px;
+  }
+  .field { display: grid; gap: 6px; margin-bottom: 18px; }
+  .field > label, .field > .flabel { font-weight: 700; font-size: 15px; }
+  .hint { font-size: 13.5px; color: var(--muted); margin: 0; }
+  input[type="text"], input[type="number"], textarea, select {
+    font: inherit;
+    font-size: 15.5px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+  textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .check-row { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; }
+  .check-row input { width: 19px; height: 19px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+
+  .out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tab {
+    font: inherit; font-size: 14px; font-weight: 700;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .prompt-box { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .prompt-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--line); }
+  .prompt-head .label { margin: 0; }
+  .prompt-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+    padding: 16px 18px 18px;
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.55;
+    max-height: 620px;
+    overflow: auto;
+  }
+  .copy {
+    font: inherit; font-weight: 700; font-size: 14px;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+    flex: none;
+  }
+  .copy.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); padding: 5px 12px; font-size: 13px; }
+  .status { font-size: 13.5px; color: var(--muted); min-height: 1.4em; margin-top: 8px; }
+  ul.fixes { list-style: none; margin: 0; padding: 4px 0; }
+  ul.fixes li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--line); font-size: 15px; }
+  ul.fixes li:last-child { border-bottom: 0; }
+
+  /* Checklist */
+  ul.checks { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 12px; max-width: 70ch; }
+  ul.checks label { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
+  ul.checks input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+  ul.checks .soft { display: block; font-size: 15px; }
+  .btn-quiet { font: inherit; font-size: 14px; font-weight: 700; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+
+  footer { border-top: 1px solid var(--line); padding-block: 28px 48px; color: var(--muted); font-size: 14.5px; }
+
+  @media (max-width: 880px) {
+    .builder { grid-template-columns: minmax(0, 1fr); }
+    .out { position: static; }
+  }
+  @media (max-width: 820px) {
+    .beats { grid-template-columns: minmax(0, 1fr); }
+    .beat { border-left: 0; border-top: 1px solid var(--line); }
+    .beat:first-child { border-top: 0; }
+  }
+  @media (max-width: 480px) {
+    .row2 { grid-template-columns: minmax(0, 1fr); }
+    .lead { font-size: 18.5px; }
+    section { padding-block: 44px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+    .tab, .copy, .toc a { transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Read, <span class="mark">Play</span>, Debate</h1>
+    <p class="lead">How to ask Claude for nonfiction book courses on Recess: chapter modules, a game for every chapter, debates on hard questions, and practice that bends to each kid's interests.</p>
+    <p class="short">The short version: <span class="mark">give Claude the pages and the kids</span>, approve a course map, test one pilot chapter, then build the rest. Everything the kids touch lives inside Recess, and nothing lands there until you say yes.</p>
+    <nav class="toc" aria-label="Sections">
+      <a href="#hand">What to hand over</a>
+      <a href="#chapter">One chapter</a>
+      <a href="#games">Games</a>
+      <a href="#debate">Debates</a>
+      <a href="#widgets">Interest widgets</a>
+      <a href="#workflow">Build order</a>
+      <a href="#builder">Prompt builder</a>
+      <a href="#review">Review checklist</a>
+    </nav>
+  </header>
+
+  <section id="hand">
+    <h2>Hand Claude six things</h2>
+    <p class="sec-lead">Most of the quality is decided by the first message. These six inputs change the result more than anything else.</p>
+    <div class="inputs">
+      <div class="input">
+        <h3>The chapter itself</h3>
+        <p>Photos of the pages or a PDF. Questions and games get written from the actual text, not from Claude's memory of the book, and that's what keeps them accurate.</p>
+      </div>
+      <div class="input">
+        <h3>Each reader</h3>
+        <p>Grade, reading level, and the habit you want to work on ("grabs the flashiest detail," "rushes"). Or ask Claude to read each kid's Recess tutor notes first.</p>
+      </div>
+      <div class="input">
+        <h3>Specific interests</h3>
+        <p>"Sharks and deep-sea creatures" works. "Animals" barely does. Three to six per kid is plenty.</p>
+      </div>
+      <div class="input">
+        <h3>What "got it" means to you</h3>
+        <p>Explain it to a younger sibling? Defend a position with two facts? Whatever you pick becomes the finish line for every module.</p>
+      </div>
+      <div class="input">
+        <h3>The limits</h3>
+        <p>Session length, how often, topics to handle with care, and anything that's off the table.</p>
+      </div>
+      <div class="input">
+        <h3>Your approval rule</h3>
+        <p>"Draft here first. Nothing goes to Recess until I say so." Recess previews every change before it's made, so this rule is easy to keep.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="chapter">
+    <h2>The shape of one chapter</h2>
+    <p class="sec-lead">Every chapter runs the same five beats, so kids learn the routine and the surprises come from the content. Rocky, the tutor inside Recess, runs the conversation beats. The game runs as a Recess app.</p>
+    <div class="beats">
+      <div class="beat">
+        <p class="beat-name">Hook</p>
+        <span class="label">3 min · Rocky</span>
+        <p>Guess the chapter's key number, or vote true/false on three claims to check later.</p>
+      </div>
+      <div class="beat">
+        <p class="beat-name">Read</p>
+        <span class="label">The book</span>
+        <p>Two "stop and jot" points: one question, one surprise.</p>
+      </div>
+      <div class="beat">
+        <p class="beat-name">Talk</p>
+        <span class="label">8 min · Rocky</span>
+        <p>Teach it back with the book closed. Rocky asks "Why did the author put that in?"</p>
+      </div>
+      <div class="beat">
+        <p class="beat-name">Play</p>
+        <span class="label">7 min · Recess app</span>
+        <p>The chapter's game, built around its one focus skill.</p>
+      </div>
+      <div class="beat">
+        <p class="beat-name">Stretch</p>
+        <span class="label">5 min · Rocky or app</span>
+        <p>Use the idea in their own interest, or start a debate.</p>
+      </div>
+    </div>
+    <p class="note">Times assume a 30-minute session, with the reading done beforehand.</p>
+
+    <h3>One focus skill per chapter</h3>
+    <p class="prose soft">A game that tests everything tests nothing. Give each chapter one skill and rotate through them. The codes are the Common Core standards for reading informational text. The numbers stay the same from grade to grade, and only the difficulty goes up.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Skill</th><th>What the kid is really answering</th><th>Standard</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Main idea</strong></td><td>What's this section mostly about, and what proves it?</td><td><span class="code">RI.2</span></td></tr>
+          <tr><td><strong>Cause &amp; effect, structure</strong></td><td>Is this a cause-and-effect, a comparison, a problem and solution, or a sequence?</td><td><span class="code">RI.3 · RI.5</span></td></tr>
+          <tr><td><strong>Evidence</strong></td><td>Which sentence proves it?</td><td><span class="code">RI.1</span></td></tr>
+          <tr><td><strong>Author's purpose</strong></td><td>Why did the author include this? What do they want me to think?</td><td><span class="code">RI.6</span></td></tr>
+          <tr><td><strong>Vocabulary in context</strong></td><td>What does this word mean here, and which clue told me?</td><td><span class="code">RI.4</span></td></tr>
+          <tr><td><strong>Text features</strong></td><td>What does the chart or map show that the words don't?</td><td><span class="code">RI.7</span></td></tr>
+          <tr><td><strong>Weighing arguments</strong></td><td>Is this claim backed up well enough?</td><td><span class="code">RI.8</span></td></tr>
+          <tr><td><strong>Comparing sources</strong></td><td>Where does another source agree or disagree?</td><td><span class="code">RI.9</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="aside">
+      <p><b>Every third chapter is a boss round:</b> mixed questions from all the earlier chapters, a little harder. It's spaced review in disguise, and kids will happily take on a boss.</p>
+    </div>
+  </section>
+
+  <section id="games">
+    <h2>Games where reading is the move</h2>
+    <p class="rule">If a kid could win without reading the chapter, <span class="mark">it isn't a reading game.</span></p>
+    <p class="prose soft">In "answer a question to earn a turn" games, kids learn to rush the question so they can get back to playing. In these games, playing <em>is</em> using the reading skill.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Game</th><th>Skill</th><th>How you play</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Headline Desk</strong></td><td>Main idea</td><td>Pick the headline that covers the whole section. The trap choice is the juiciest single detail.</td></tr>
+          <tr><td><strong>Prove It</strong></td><td>Evidence</td><td>A claim appears. Tap the one sentence in the passage that proves it.</td></tr>
+          <tr><td><strong>Chain Reaction</strong></td><td>Cause &amp; effect</td><td>Put cause-and-effect cards in order. One card just happened at the same time and doesn't belong in the chain.</td></tr>
+          <tr><td><strong>Guess the Number</strong></td><td>Numbers &amp; scale</td><td>Estimate the chapter's key figure before reading, then score by how close you came.</td></tr>
+          <tr><td><strong>Word Detective</strong></td><td>Vocabulary</td><td>Pick what a word means here, then tap the clue that gave it away.</td></tr>
+          <tr><td><strong>Diagram Decoder</strong></td><td>Text features</td><td>Answer questions that only the chart, map, or diagram can answer.</td></tr>
+          <tr><td><strong>Claim Court</strong></td><td>Author's purpose</td><td>Sort statements into fact, opinion, and claim that still needs proof.</td></tr>
+          <tr><td><strong>Two Witnesses</strong></td><td>Comparing sources</td><td>The book and a second source describe the same event. Flag where they disagree.</td></tr>
+          <tr><td><strong>Boss Round</strong></td><td>Everything so far</td><td>Mixed items from every earlier chapter, harder, with a score to beat.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h3>How games work inside Recess</h3>
+      <ul class="plain">
+        <li>Each game is built as a Recess app and linked from the chapter's module. The kid never leaves Recess, and Rocky can see how it went.</li>
+        <li>Game moves are taps, sorts, orderings, and typed numbers. Writing and arguing happen in the conversation with Rocky, since they don't have one right answer to grade.</li>
+        <li>A wrong answer opens a short guided detour instead of a red X. Tell Claude which mistake you expect ("picks the most exciting detail"), and the detour will be built around it.</li>
+        <li>Any passage inside a game is written fresh from the chapter's facts. Nothing is copied from the book.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="debate">
+    <h2>Debates that build thinkers, not fights</h2>
+    <p class="sec-lead">Controversial topics are where reading turns into thinking. A clear structure keeps the argument about evidence instead of about who's right.</p>
+
+    <h3>A good debate question passes three tests</h3>
+    <div class="tests">
+      <div class="test"><h4>Two real sides</h4><p>Thoughtful, well-informed adults actually disagree about it.</p></div>
+      <div class="test"><h4>Answerable from the book</h4><p>The chapter gives both sides something to work with.</p></div>
+      <div class="test"><h4>About choices, not people</h4><p>Debate what we should do, never who someone is.</p></div>
+    </div>
+    <div class="rewrites">
+      <div class="rewrite"><span class="from">Are zoos bad?</span><span class="arrow" aria-hidden="true">→</span><span class="to">Should zoos keep elephants?</span></div>
+      <div class="rewrite"><span class="from">Are phones bad for kids?</span><span class="arrow" aria-hidden="true">→</span><span class="to">Should phones be locked away during the school day?</span></div>
+    </div>
+
+    <h3>The round, about 15 minutes</h3>
+    <ol class="steps">
+      <li><p><b>Take a stand.</b> Mark a spot from 0 to 10. Rocky records it.</p></li>
+      <li><p><b>Warm up.</b> A quick game: sort claim, evidence, and reasoning, then spot the weakest argument.</p></li>
+      <li><p><b>Argue your assigned side</b> with two pieces of evidence from the chapter. Rocky pushes back.</p></li>
+      <li><p><b>Switch sides.</b> Make the best case for the view you just argued against.</p></li>
+      <li><p><b>Land.</b> Mark the line again and name what moved you, even a little.</p></li>
+    </ol>
+    <p class="note">This is a format called Structured Academic Controversy, adapted for one reader and a tutor. Use that name when you ask, and Claude will know the format.</p>
+
+    <h3>Guardrails to ask for</h3>
+    <ul class="plain prose">
+      <li>Rocky stays neutral and never gives an opinion of its own.</li>
+      <li>Argue with ideas, never with people. Evidence beats volume.</li>
+      <li>You preview any question that touches family values. Some of those belong at your kitchen table, not in the app.</li>
+      <li>A kid can pass on a topic, no questions asked.</li>
+    </ul>
+
+    <h3>How a round is scored</h3>
+    <div class="rubric">
+      <div><b>Claim</b><span>Clear and specific · 1–3</span></div>
+      <div><b>Evidence</b><span>From the chapter · 1–3</span></div>
+      <div><b>Reasoning</b><span>Explains why it matters · 1–3</span></div>
+      <div><b>Rebuttal</b><span>Answers the other side respectfully · 1–3</span></div>
+    </div>
+    <p class="note">Add a bonus for "I changed my mind because…" Updating your view is the skill you most want them to learn.</p>
+    <div class="aside">
+      <p><b>Two readers on the same book?</b> Give them opposite sides and let Rocky coach each one separately. Then hold the final round at dinner, with you as the judge.</p>
+    </div>
+  </section>
+
+  <section id="widgets">
+    <h2>Widgets that bend to each kid</h2>
+    <p class="sec-lead">To personalize well, change the setting of the problem. The facts and the skill stay the same.</p>
+    <div class="split">
+      <div>
+        <h3>Stays the same for everyone</h3>
+        <ul class="plain">
+          <li>The chapter's facts</li>
+          <li>The focus skill</li>
+          <li>The right answers</li>
+          <li>The difficulty target</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Changes for each kid</h3>
+        <ul class="plain">
+          <li>The scenario and the examples</li>
+          <li>The last question, where they use the idea in their own interest</li>
+          <li>How much text is on each screen</li>
+          <li>How many hints come before the detour</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>One idea, three worlds</h3>
+    <p class="prose soft">The chapter's idea: take one species out of a food web and the effects ripple through it. The skill: follow a chain of effects.</p>
+    <div class="lenses">
+      <div class="lens"><span class="label">For the ocean fan</span><p>Sea otters disappear from a kelp forest. What happens to the sea urchins, and then to the kelp?</p></div>
+      <div class="lens"><span class="label">For the wolf fan</span><p>Wolves come back to Yellowstone. What happens to the elk, and then to the willows along the rivers?</p></div>
+      <div class="lens"><span class="label">For the gamer</span><p>Every fox vanishes from your survival world. What happens to the rabbits, and then to your carrot farm?</p></div>
+    </div>
+
+    <div class="panel">
+      <h3>How Recess makes this work</h3>
+      <ul class="plain">
+        <li><b>Build once, version per kid.</b> A Recess app is built as a template, and each reader gets their own version with their own content, no rebuild needed. The look is always Recess's. What changes is the content.</li>
+        <li><b>Where the interests come from:</b> your list, Rocky's running notes on each kid, or the kid picking a theme at the start of a chapter.</li>
+        <li><b>Two ways to start.</b> <span class="code">prepare</span> opens with a worked example, for a kid seeing the skill for the first time. <span class="code">remediate</span> opens by working through a mistake that kid tends to make.</li>
+        <li><b>Follow-ups.</b> Turn on applet follow-ups for the goal, and a mistake the kid keeps making can trigger an extra practice applet.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="workflow">
+    <h2>The build order</h2>
+    <p class="sec-lead">First the map, then one pilot chapter, then the rest in batches. There are three approval points, and nothing goes to Recess until you say yes.</p>
+    <ol class="steps">
+      <li><p>You send the course-map prompt and the first chapter's pages.</p></li>
+      <li><div><p>Claude drafts a course map here in chat: the skill, game, debate question, and interest hooks for every chapter.</p><span class="gate">You approve the map</span></div></li>
+      <li><div><p>Claude builds Chapter 1 as a pilot, with the module, the game, and the interest widget, all drafted here with a walkthrough.</p><span class="gate">You approve the drafts</span></div></li>
+      <li><div><p>Recess shows a preview of exactly what will be created. It's created only after that, and assigned only when you say.</p><span class="gate">You approve the preview</span></div></li>
+      <li><p>Play the pilot yourself first, then with a kid. Tell Claude what dragged, what was too easy, and what they loved.</p></li>
+      <li><p>Claude builds the remaining chapters three at a time, through the same approval points. Once it works, save it as a template to reuse with another kid or another book.</p></li>
+    </ol>
+    <p class="note">Each kid can have 12 open goals on Recess. Archiving a finished course frees up a slot and keeps its history.</p>
+  </section>
+
+  <section id="builder">
+    <h2>Prompt builder</h2>
+    <p class="sec-lead">Fill this in once. The prompts update as you type. Copy them into a chat with Claude, in order.</p>
+    <div class="builder">
+      <form id="form" autocomplete="off">
+        <span class="example-tag">Example filled in. Replace it with your own.</span>
+
+        <div class="field">
+          <label for="f-book">Book and author</label>
+          <input type="text" id="f-book" value="The Omnivore's Dilemma (Young Readers Edition) by Michael Pollan">
+        </div>
+
+        <div class="field">
+          <label for="f-source">What you'll give Claude</label>
+          <select id="f-source">
+            <option value="photos" selected>Photos of each chapter's pages</option>
+            <option value="pdf">A PDF of the book</option>
+            <option value="toc">Only the table of contents for now</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f-readers">Readers</label>
+          <p class="hint" id="h-readers">One line per reader: name, grade, reading level, a habit to work on, interests.</p>
+          <textarea id="f-readers" rows="4" aria-describedby="h-readers">Sam — 6th grade, reads above level, tends to rush. Loves: soccer, sharks, Minecraft
+Lily — 4th grade, reads on level, careful but quiet. Loves: horses, baking, drawing</textarea>
+          <label class="check-row" for="f-notes"><input type="checkbox" id="f-notes" checked> Have Claude read each kid's Recess tutor notes first</label>
+        </div>
+
+        <div class="field">
+          <label for="f-gotit">"Got it" means…</label>
+          <textarea id="f-gotit" rows="2">Can explain the chapter's big idea to a younger kid and back it up with two facts from the book.</textarea>
+        </div>
+
+        <div class="field">
+          <label for="f-care">Handle with care</label>
+          <textarea id="f-care" rows="2">Keep food debates about farms, companies, and policies, never about anyone's own diet or body.</textarea>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="f-minutes">Session length</label>
+            <select id="f-minutes">
+              <option value="20">20 minutes</option>
+              <option value="30" selected>30 minutes</option>
+              <option value="45">45 minutes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-versions">Versions</label>
+            <select id="f-versions">
+              <option value="one">One version</option>
+              <option value="two" selected>Fuller + simplified</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-style">Game style</label>
+            <select id="f-style">
+              <option value="calm">Calm puzzles</option>
+              <option value="mix" selected>A mix</option>
+              <option value="arcade">Fast, arcade-style</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-debate">Debates</label>
+            <select id="f-debate">
+              <option value="every">Every chapter</option>
+              <option value="other" selected>Every other chapter</option>
+              <option value="section">Once per section</option>
+              <option value="none">None</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-shape">Build it as</label>
+            <select id="f-shape">
+              <option value="personal" selected>A goal for these kids</option>
+              <option value="template">A reusable template</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-chapter">Chapter to build</label>
+            <input type="number" id="f-chapter" min="1" max="99" value="1">
+          </div>
+        </div>
+      </form>
+
+      <div class="out">
+        <div class="tabs" role="tablist" aria-label="Prompts">
+          <button class="tab" role="tab" id="t-map" aria-selected="true" aria-controls="panel" data-key="map">1 · Course map</button>
+          <button class="tab" role="tab" id="t-pilot" aria-selected="false" aria-controls="panel" data-key="pilot" tabindex="-1">2 · Pilot chapter</button>
+          <button class="tab" role="tab" id="t-debate" aria-selected="false" aria-controls="panel" data-key="debate" tabindex="-1">3 · Debate</button>
+          <button class="tab" role="tab" id="t-widget" aria-selected="false" aria-controls="panel" data-key="widget" tabindex="-1">4 · Interest widget</button>
+          <button class="tab" role="tab" id="t-fixes" aria-selected="false" aria-controls="panel" data-key="fixes" tabindex="-1">Quick fixes</button>
+        </div>
+        <div class="prompt-box" id="panel" role="tabpanel" aria-labelledby="t-map">
+          <div class="prompt-head">
+            <span class="label" id="panel-label">Send first</span>
+            <button type="button" class="copy" id="copy-main">Copy prompt</button>
+          </div>
+          <pre class="prompt-text" id="prompt-text" tabindex="0"></pre>
+          <ul class="fixes" id="fixes" hidden></ul>
+        </div>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="review">
+    <h2>Before you approve a draft</h2>
+    <p class="sec-lead">Eight quick checks. A single "no" is worth sending back with a one-line note.</p>
+    <ul class="checks" id="checks">
+      <li><label><input type="checkbox" id="c1"><span>A kid who skipped the chapter could <em>not</em> win the game.</span></label></li>
+      <li><label><input type="checkbox" id="c2"><span>Each chapter has one clear focus skill.</span></label></li>
+      <li><label><input type="checkbox" id="c3"><span>A wrong answer teaches something instead of only saying "wrong."</span></label></li>
+      <li><label><input type="checkbox" id="c4"><span>The debate question has a strong case on both sides.</span></label></li>
+      <li><label><input type="checkbox" id="c5"><span>The interest is part of the problem, not a sticker on top.</span></label></li>
+      <li><label><input type="checkbox" id="c6"><span>The kid produces something (an explanation, an argument, an estimate), not just taps.<span class="soft">Taps are for games. Thinking out loud happens with Rocky.</span></span></label></li>
+      <li><label><input type="checkbox" id="c7"><span>Every fact traces back to the pages you provided and is written in fresh words.</span></label></li>
+      <li><label><input type="checkbox" id="c8"><span>The whole session fits the time you set.</span></label></li>
+    </ul>
+    <button type="button" class="btn-quiet" id="clear-checks">Clear checks</button>
+  </section>
+
+  <footer>
+    These prompts are starting points, so change anything that doesn't sound like you. The more specific your feedback on a draft ("chapter 3's game is too easy for Sam"), the better the next version gets.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var FIELDS = ["f-book", "f-source", "f-readers", "f-notes", "f-gotit", "f-care", "f-minutes", "f-versions", "f-style", "f-debate", "f-shape", "f-chapter"];
+  var STORE = "rpd-builder-v1";
+  var current = "map";
+
+  function el(id) { return document.getElementById(id); }
+  function v(id) {
+    var e = el(id);
+    if (!e) return "";
+    if (e.type === "checkbox") return e.checked;
+    return (e.value || "").trim();
+  }
+
+  // Restore saved inputs (per-viewer convenience only)
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (saved) {
+      FIELDS.forEach(function (id) {
+        if (!(id in saved)) return;
+        var e = el(id);
+        if (e.type === "checkbox") e.checked = !!saved[id]; else e.value = saved[id];
+      });
+    }
+  } catch (err) {}
+
+  function save() {
+    try {
+      var o = {};
+      FIELDS.forEach(function (id) { var e = el(id); o[id] = e.type === "checkbox" ? e.checked : e.value; });
+      localStorage.setItem(STORE, JSON.stringify(o));
+    } catch (err) {}
+  }
+
+  var SOURCE = {
+    photos: "I'll attach photos of each chapter's pages as we go.",
+    pdf: "I'll attach the book as a PDF.",
+    toc: "For now I only have the table of contents. Ask me for each chapter's pages before writing questions for it."
+  };
+  var SHAPE = {
+    personal: "a module-backed goal for these readers (not a reusable template yet)",
+    template: "a reusable Recess goal template I can apply to other kids later"
+  };
+  var STYLE = {
+    calm: "calm puzzles: sorting, ordering, detective work",
+    mix: "a mix of calm puzzles and a few fast rounds",
+    arcade: "fast, arcade-style rounds with scores to beat"
+  };
+  var DEBATE = {
+    every: "a debate question for every chapter that can support one",
+    other: "a debate question for every other chapter",
+    section: "one debate question per section of the book",
+    none: ""
+  };
+
+  function book() { return v("f-book") || "[book title and author]"; }
+  function readers() { return v("f-readers") || "[name, grade, reading level, habit to work on, interests]"; }
+  function ch() { var n = parseInt(v("f-chapter"), 10); return isNaN(n) || n < 1 ? 1 : n; }
+  function care() { return v("f-care") || "Nothing specific. Use good judgment for kids this age."; }
+
+  function mapPrompt() {
+    var lines = [];
+    lines.push("I'm building a nonfiction reading course on Recess for " + book() + ". " + (SOURCE[v("f-source")] || ""));
+    lines.push("");
+    lines.push("Readers:");
+    lines.push(readers());
+    if (v("f-notes")) { lines.push(""); lines.push("Before planning, read each reader's Recess tutor notes and current goals."); }
+    lines.push("");
+    var p = "Build it as " + SHAPE[v("f-shape")] + ". Sessions run about " + v("f-minutes") + " minutes, with the reading done beforehand.";
+    if (v("f-versions") === "two") p += " Give every module two versions: a fuller one and a simplified one.";
+    lines.push(p);
+    lines.push("");
+    lines.push("First, draft a course map here in chat. Don't create anything on Recess yet. For each chapter, give me:");
+    lines.push("- the one comprehension skill it focuses on (rotate main idea, cause and effect or text structure, evidence, author's purpose, vocabulary in context, text features)");
+    lines.push("- a before-reading hook: a number to guess or claims to vote on");
+    lines.push("- a game where using that skill is the game move, so a kid who skipped the chapter can't win. Style: " + STYLE[v("f-style")]);
+    lines.push("- 2–3 talk-back questions for Rocky, in the Questioning the Author style");
+    lines.push("- an interest hook for each reader");
+    if (DEBATE[v("f-debate")]) lines.push("- " + DEBATE[v("f-debate")]);
+    lines.push("- a boss round every third chapter that mixes skills from earlier chapters");
+    lines.push("");
+    lines.push("\"Got it\" means: " + (v("f-gotit") || "the reader can explain the chapter's big idea with evidence."));
+    lines.push("Handle with care: " + care());
+    lines.push("");
+    lines.push("Base every question on the pages I give you, not on what you remember about the book. Write game passages in fresh words instead of copying the book.");
+    return lines.join("\n");
+  }
+
+  function pilotPrompt() {
+    var two = v("f-versions") === "two";
+    var lines = [];
+    lines.push("Using the course map we agreed on, build Chapter " + ch() + " of " + book() + " as a pilot. Draft everything here in chat first:");
+    lines.push("");
+    lines.push("1. The Recess module: student-facing launch, learning target, tutor guidance for Rocky, a quiz-out path, the activity recipe, the student artifact, completion criteria, likely misconceptions, and support and stretch branches.");
+    lines.push("2. The chapter game as a Recess app, built from this chapter's actual facts. Name the mistake it targets and walk me through the wrong-answer detour step by step.");
+    lines.push("3. The interest widget: one template, with a version for each reader themed to their interests. The chapter's facts and correct answers stay identical across versions.");
+    if (two) lines.push("4. A fuller version and a simplified version of the module.");
+    lines.push("");
+    lines.push("Readers:");
+    lines.push(readers());
+    lines.push("");
+    lines.push("Sessions run about " + v("f-minutes") + " minutes. Handle with care: " + care());
+    lines.push("");
+    lines.push("After I approve the drafts, show me the Recess preview before creating anything, and wait for my OK before assigning it to anyone.");
+    return lines.join("\n");
+  }
+
+  function debatePrompt() {
+    var lines = [];
+    lines.push("Build a debate module for Chapter " + ch() + " of " + book() + ".");
+    lines.push("");
+    lines.push("Start by proposing three debate questions. For each, tell me why thoughtful, informed people disagree about it, and give the strongest point on each side from the chapter. I'll pick one.");
+    lines.push("");
+    lines.push("Then build it as a Structured Academic Controversy for one reader and Rocky:");
+    lines.push("1. Take a stand on a 0–10 line, and record it.");
+    lines.push("2. Warm-up game: sort claim, evidence, and reasoning, then spot the weakest argument.");
+    lines.push("3. The reader argues an assigned side with two pieces of evidence from the chapter. Rocky pushes back.");
+    lines.push("4. Switch sides and make the best case for the other view.");
+    lines.push("5. Mark the line again and name what moved them, even a little.");
+    lines.push("");
+    lines.push("Rocky stays neutral, never gives an opinion of its own, and argues against ideas, never people. Score with a four-part rubric (claim, evidence, reasoning, respectful rebuttal, 1–3 each), and count a changed mind as a win. A reader can pass on a topic.");
+    lines.push("");
+    lines.push("Readers:");
+    lines.push(readers());
+    lines.push("");
+    lines.push("Handle with care: " + care());
+    lines.push("");
+    lines.push("Draft it here first. Nothing goes to Recess until I approve.");
+    return lines.join("\n");
+  }
+
+  function widgetPrompt() {
+    var lines = [];
+    lines.push("Make a reinforcement widget for Chapter " + ch() + " of " + book() + " that adapts to each reader's interests.");
+    lines.push("");
+    lines.push("Keep fixed: the chapter's key facts, the focus skill from the course map, the correct answers, and the difficulty target.");
+    lines.push("Change per reader: the scenario, the examples, and a last question where they use the chapter's idea in one of their own interests.");
+    lines.push("");
+    lines.push("Readers:");
+    lines.push(readers());
+    lines.push("");
+    lines.push("Build it as one Recess app template with a version for each reader. Use prepare mode (worked example first) for a reader new to the skill, and remediate mode for a reader with a known habit to work on. Take those from the notes above. Turn on applet follow-ups for the goal so a mistake the reader keeps making generates extra practice.");
+    lines.push("");
+    lines.push("Show me every version side by side before anything goes to Recess.");
+    return lines.join("\n");
+  }
+
+  function fixes() {
+    return [
+      "Chapter " + ch() + "'s game can be won without reading. Make using the skill the game move.",
+      "This debate question is one-sided. Rewrite it so a thoughtful adult could argue either side.",
+      "Too wordy. Cut the text on every screen in half.",
+      "The interest is just a sticker. Put it inside the problem.",
+      "Walk me through the wrong-answer path for question 2.",
+      "Make the simplified version shorter, not babyish.",
+      "Add a boss round that mixes chapters 1–3.",
+      "It works. Save it as a template I can reuse for another book."
+    ];
+  }
+
+  var META = {
+    map: { label: "Send first", build: mapPrompt },
+    pilot: { label: "After you approve the map", build: pilotPrompt },
+    debate: { label: "Any chapter with a debate", build: debatePrompt },
+    widget: { label: "Any chapter", build: widgetPrompt },
+    fixes: { label: "Paste after any draft", build: null }
+  };
+
+  function render() {
+    var m = META[current];
+    el("panel-label").textContent = m.label;
+    var pre = el("prompt-text"), list = el("fixes"), copyBtn = el("copy-main");
+    if (current === "fixes") {
+      pre.hidden = true; copyBtn.hidden = true; list.hidden = false;
+      list.innerHTML = "";
+      fixes().forEach(function (t, i) {
+        var li = document.createElement("li");
+        var span = document.createElement("span"); span.textContent = t;
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "copy ghost"; b.textContent = "Copy";
+        b.setAttribute("aria-label", "Copy: " + t);
+        b.addEventListener("click", function () { copyText(t, span); });
+        li.appendChild(span); li.appendChild(b); list.appendChild(li);
+      });
+    } else {
+      pre.hidden = false; copyBtn.hidden = false; list.hidden = true;
+      pre.textContent = m.build();
+    }
+  }
+
+  function selectNode(node) {
+    try {
+      var r = document.createRange(); r.selectNodeContents(node);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch (err) {}
+  }
+
+  function copyText(text, node) {
+    var status = el("status");
+    function fallback() {
+      selectNode(node);
+      status.textContent = "Selected. Press Ctrl+C or ⌘C to copy.";
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          status.textContent = "Copied. Paste it into a chat with Claude.";
+        }, fallback);
+      } else { fallback(); }
+    } catch (err) { fallback(); }
+  }
+
+  el("copy-main").addEventListener("click", function () {
+    copyText(el("prompt-text").textContent, el("prompt-text"));
+  });
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  function activate(tab, focus) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+    });
+    current = tab.getAttribute("data-key");
+    el("panel").setAttribute("aria-labelledby", tab.id);
+    el("status").textContent = "";
+    render();
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { activate(t, false); });
+    t.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        var n = (i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        activate(tabs[n], true);
+      }
+    });
+  });
+
+  el("form").addEventListener("input", function () { save(); render(); });
+  el("form").addEventListener("change", function () { save(); render(); });
+  el("form").addEventListener("submit", function (e) { e.preventDefault(); });
+
+  el("clear-checks").addEventListener("click", function () {
+    Array.prototype.forEach.call(document.querySelectorAll("#checks input"), function (c) { c.checked = false; });
+  });
+
+  render();
+})();
+</script>
